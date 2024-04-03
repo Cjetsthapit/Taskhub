@@ -1,28 +1,30 @@
 package com.sthapit.taskhub
 
+import AuthViewModel
+import LoginScreen
+
+import RegisterScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
+import androidx.activity.viewModels
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
 import com.sthapit.taskhub.ui.theme.TaskhubTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val authViewModel: AuthViewModel by viewModels()
         setContent {
+            FirebaseApp.initializeApp(this)
             TaskhubTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
+                Surface() {
+                    AppNavigation(authViewModel = authViewModel)
                 }
             }
         }
@@ -30,17 +32,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun AppNavigation(authViewModel: AuthViewModel) {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TaskhubTheme {
-        Greeting("Android")
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            LoginScreen(navController = navController,authViewModel = authViewModel, onLoginSuccess = {
+                navController.navigate("mainScreen")
+            })
+        }
+        composable("register") {
+            RegisterScreen(navController = navController,authViewModel = authViewModel, onRegisterSuccess = {
+                navController.navigate("login")
+            })
+        }
+        composable("mainScreen") {
+            MainScreen(navController = navController,authViewModel = authViewModel,)
+        }
     }
 }
+

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "102507189490",
+    "project_id": "taskhub-9363e",
+    "storage_bucket": "taskhub-9363e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102507189490:android:b5ab37f076853d21b1ec6b",
+        "android_client_info": {
+          "package_name": "com.sthapit.taskhub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKbCjkYiY2JWE14aT7XjRv2Tk8bm5o5fI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
