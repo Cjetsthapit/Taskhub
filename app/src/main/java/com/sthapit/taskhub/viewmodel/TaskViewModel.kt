@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,21 +18,6 @@ class TaskViewModel : ViewModel() {
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
     val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()
 
-//     fun fetchTasks(userId:String) {
-//         if (userId == null) {
-//             Log.e(TAG, "User ID is null.")
-//             _tasks.value = emptyList() // Clear the tasks or handle this scenario as needed
-//             return
-//         }
-//         Log.e("Fetching", userId)
-//         db.collection("users").document(userId).collection("tasks")
-//             .get()
-//             .addOnSuccessListener { result ->
-//                 for (document in result) {
-//                     Log.d("TaskListing", "${document.id} => ${document.data}")
-//                 }
-//             }
-//    }
 suspend fun fetchTasks(userId: String) {
     if (userId.isEmpty()) {
         Log.e(TAG, "User ID is null or empty.")
@@ -53,6 +39,7 @@ suspend fun fetchTasks(userId: String) {
                     status = document.getBoolean("status") ?: false,
                     timeEstimation = document.getString("timeEstimation") ?: ""
                 )
+
             } catch (e: Exception) {
                 Log.e("TaskParsing", "Error parsing task ${document.id}", e)
                 null
@@ -68,26 +55,48 @@ suspend fun fetchTasks(userId: String) {
 
      fun addTask(task: Task, userId: String) {
         viewModelScope.launch {
+            try{
+
             val taskRef = db.collection("users").document(userId).collection("tasks").document(task.id)
 
             taskRef.set(task)
                 .addOnSuccessListener { Log.d(TAG, "Task added to user $userId subcollection") }
                 .addOnFailureListener { e -> Log.w(TAG, "Error adding task", e) }
+                fetchTasks(userId)
+            } catch (e: Exception){
+                Log.e("TaskViewModel", "Error adding task", e)
+            }
 
         }
 
 
     }
 
-    fun updateTask(task: Task) {
+    fun updateTask(task: Task, userId: String) {
         viewModelScope.launch {
-//            db.collection("tasks").document(task.id.toString()).set(task)
+            try {
+                val taskRef = db.collection("users").document(userId).collection("tasks").document(task.id)
+                taskRef.set(task, SetOptions.merge())
+                    .addOnSuccessListener { Log.d(TAG, "Task successfully updated") }
+                    .addOnFailureListener { e -> Log.e(TAG, "Error updating task", e) }
+                fetchTasks(userId)
+            } catch (e: Exception) {
+                Log.e("TaskViewModel", "Error updating task", e)
+            }
         }
     }
 
-    fun deleteTask(task: Task) {
+    fun deleteTask(task: Task, userId: String) {
         viewModelScope.launch {
-//            db.collection("tasks").document(task.id.toString()).delete()
+            try {
+                val taskRef = db.collection("users").document(userId).collection("tasks").document(task.id)
+                taskRef.delete()
+                    .addOnSuccessListener { Log.d(TAG, "Task successfully deleted") }
+                    .addOnFailureListener { e -> Log.e(TAG, "Error deleting task", e) }
+                fetchTasks(userId)
+            } catch (e: Exception) {
+                Log.e("TaskViewModel", "Error deleting task", e)
+            }
         }
     }
 }
