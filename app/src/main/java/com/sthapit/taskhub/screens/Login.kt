@@ -10,13 +10,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
-
 @Composable
 fun LoginScreen(
-
     navController: NavController,
     authViewModel : AuthViewModel,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onRegisterClick: () -> Unit // Add a callback for navigating to the register screen
 ) {
     var email by remember { mutableStateOf("sth@gmail.com") }
     var password by remember { mutableStateOf("123123") }
@@ -28,17 +27,16 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-//                .background(Brush.verticalGradient(colors = listOf(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.1f), androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.3f))))
         )
 
         // Centered Column for content
         Column(
             modifier = Modifier
-                .align(Alignment.Center) // Align the Column itself within the Box
+                .align(Alignment.Center)
                 .padding(16.dp)
-                .fillMaxWidth(), // Fill the maximum width available
-            horizontalAlignment = Alignment.CenterHorizontally, // Center content horizontally within the Column
-            verticalArrangement = Arrangement.Center // Center content vertically within the Column
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text("Login to TaskHub", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
             if (errorMessage != null) {
@@ -51,7 +49,7 @@ fun LoginScreen(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(), // Make the TextField expand to fill the width
+                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -61,7 +59,7 @@ fun LoginScreen(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth(), // Make the TextField expand to fill the width
+                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                 singleLine = true
             )
@@ -70,20 +68,21 @@ fun LoginScreen(
             // Login Button
             Button(
                 onClick = {
-                    authViewModel.login(email, password, onLoginSuccess) { error ->
-                        errorMessage = error
+                    authViewModel.login(email, password, onLoginSuccess) {
+                        // If login is successful, navigate to MembershipPurchaseScreen
+                        onLoginSuccess()
                     }
                 },
                 modifier = Modifier
-                    .fillMaxWidth() // Expand button to fill the width
-                    .height(56.dp) // Increase the button's height for a larger touch target
+                    .fillMaxWidth()
+                    .height(56.dp)
             ) {
                 Text("Login", fontSize = 18.sp)
             }
             Spacer(modifier = Modifier.height(16.dp))
 
             // Navigation to Register Page
-            TextButton(onClick = { navController.navigate("register") }) {
+            TextButton(onClick = onRegisterClick) {
                 Text("Don't have an account? Register", fontSize = 16.sp)
             }
         }

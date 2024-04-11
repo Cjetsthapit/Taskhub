@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
+import com.sthapit.taskhub.screens.MembershipPurchaseScreen
 import com.sthapit.taskhub.ui.theme.TaskhubTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,17 +38,37 @@ fun AppNavigation(authViewModel: AuthViewModel) {
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
-            LoginScreen(navController = navController,authViewModel = authViewModel, onLoginSuccess = {
-                navController.navigate("mainScreen")
-            })
+            LoginScreen(
+                navController = navController,
+                authViewModel = authViewModel,
+                onLoginSuccess = {
+                    navController.navigate("membershipPurchase")
+                },
+                onRegisterClick = {
+                    navController.navigate("register")
+                }
+            )
         }
         composable("register") {
-            RegisterScreen(navController = navController,authViewModel = authViewModel, onRegisterSuccess = {
-                navController.navigate("login")
-            })
+            RegisterScreen(
+                navController = navController,
+                authViewModel = authViewModel,
+                onRegisterSuccess = {
+                    navController.navigate("login")
+                }
+            )
         }
         composable("mainScreen") {
-            MainScreen(navController = navController,authViewModel = authViewModel,)
+            MainScreen(navController = navController, authViewModel = authViewModel)
+        }
+        composable("membershipPurchase") {
+            MembershipPurchaseScreen(
+                navController = navController,
+                authViewModel = authViewModel,
+                onPurchaseSuccess = {
+                    navController.navigate("mainScreen")
+                }
+            )
         }
     }
 }
