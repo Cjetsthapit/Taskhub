@@ -63,8 +63,6 @@ fun AppNavigation(authViewModel: AuthViewModel) {
         }
         composable("membershipPurchase") {
             MembershipPurchaseScreen(
-                navController = navController,
-                authViewModel = authViewModel,
                 onPurchaseSuccess = {
                     navController.navigate("mainScreen")
                 }
