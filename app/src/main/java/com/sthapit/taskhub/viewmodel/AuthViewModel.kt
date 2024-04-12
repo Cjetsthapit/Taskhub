@@ -50,5 +50,10 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+    fun logout() {
+        auth.signOut()
+        _userId.value = null // Clear the user ID upon logout
+        Log.d("AuthViewModel", "User logged out")
+    }
 }
 

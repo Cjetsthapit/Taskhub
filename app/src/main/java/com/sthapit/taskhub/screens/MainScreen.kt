@@ -39,7 +39,14 @@ fun MainScreen(taskViewModel: TaskViewModel = viewModel(), navController: NavCon
     val userId by authViewModel.userId.collectAsState()
 
     LaunchedEffect(userId) {
-        userId?.let { taskViewModel.fetchTasks(it) }
+        if (userId == null) {
+            // Navigate to login screen or perform any other necessary actions
+            // For example:
+            navController.navigate("login")
+        } else {
+            userId?.let { taskViewModel.fetchTasks(it) }
+        }
+
     }
 
     Scaffold(
@@ -48,7 +55,7 @@ fun MainScreen(taskViewModel: TaskViewModel = viewModel(), navController: NavCon
                 title = { Text("TaskHub") }, // Set the title for your AppBar
                 actions = {
                     // Add actions if necessary, for example, a logout button
-                    IconButton(onClick = { /* Handle logout here */ }) {
+                    IconButton(onClick = { authViewModel.logout()  }) {
                         Icon(Icons.Filled.ExitToApp, contentDescription = "Logout")
                     }
                 }
