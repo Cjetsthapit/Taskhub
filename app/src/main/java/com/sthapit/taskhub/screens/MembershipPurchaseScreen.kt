@@ -1,6 +1,7 @@
 package com.sthapit.taskhub.screens
 
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,16 +46,18 @@ fun MembershipPurchaseScreen(
     val expiryMonth = remember { mutableStateOf("") }
     val cvv = remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = androidx.compose.ui.Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Paypal",
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(vertical = 32.dp)
+            modifier = androidx.compose.ui.Modifier.padding(vertical = 32.dp)
         )
+
         OutlinedTextField(
             value = cardNumber.value,
             onValueChange = { cardNumber.value = it },
@@ -103,25 +107,11 @@ fun MembershipPurchaseScreen(
             )
         )
         Button(onClick = {
-            if (!ValidatorsUtil.isValidCardNumber(cardNumber.value) ||
-                !ValidatorsUtil.isValidExpiry(expiryMonth.value, expiryYear.value) ||
-                !ValidatorsUtil.isValidCVV(cvv.value)
-            ) {
-                // Show error message if any of the fields are invalid
-                dialogMessage = "Please check your input fields for errors."
-                showDialog = true
-            } else {
-                // Process payment if all fields are valid
-                paymentStatus = "Processing..."
-                val cardInfo = CardInfo(cardNumber.value, expiryMonth.value, expiryYear.value, cvv.value)
-                paymentViewModel.processCardPayment(cardInfo) { status, success ->
-                    dialogMessage = status
-                    showDialog = false
-                    if (success) {
-                        onPurchaseSuccess()
-                    }
-                }
-            }
+            // Replace true with your condition for payment validity
+                // Save membership status if purchase is successful
+                MembershipManager.saveMembershipStatus(context, true)
+                onPurchaseSuccess()
+
         }) {
             Text("Pay with Card")
         }

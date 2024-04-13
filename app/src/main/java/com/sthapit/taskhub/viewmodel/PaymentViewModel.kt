@@ -68,6 +68,16 @@ class PaymentViewModel : ViewModel() {
                 onResult("Error processing payment: ${e.localizedMessage}", false)
             }
         }
+        fun hasMembership(): Boolean {
+            // Implement the logic to check if the user has a membership.
+            // This function should return true if the user has a membership, false otherwise.
+            // You can use any appropriate method here, such as checking a local database, making a network request, etc.
+            return true // Placeholder, replace with your actual implementation
+        }
+    }
+
+    fun hasMembership(): Boolean {
+        return true
     }
 //    fun processCardPayment(cardInfo: CardInfo, onResult: (String) -> Unit) {
 //        viewModelScope.launch {
