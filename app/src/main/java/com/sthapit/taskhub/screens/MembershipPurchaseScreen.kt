@@ -107,10 +107,13 @@ fun MembershipPurchaseScreen(
             )
         )
         Button(onClick = {
-            // Replace true with your condition for payment validity
-                // Save membership status if purchase is successful
+            if (!ValidatorsUtil.isValidCardNumber(cardNumber.value) || !ValidatorsUtil.isValidExpiry(expiryMonth.value, expiryYear.value) || !ValidatorsUtil.isValidCVV(cvv.value)) {
+                dialogMessage = "Please check your input fields for errors."
+                showDialog = true
+            } else {
                 MembershipManager.saveMembershipStatus(context, true)
                 onPurchaseSuccess()
+            }
 
         }) {
             Text("Pay with Card")
