@@ -7,11 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import com.sthapit.taskhub.viewmodel.PaymentViewModel
 
@@ -19,7 +15,7 @@ import com.sthapit.taskhub.viewmodel.PaymentViewModel
 fun LoginScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String) -> Unit,
     paymentViewModel: PaymentViewModel,
     onRegisterClick: () -> Unit // Add a callback for navigating to the register screen
 ) {
@@ -27,7 +23,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("123123") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val currentContext = LocalContext.current
-
+    val status by authViewModel.status.collectAsState()
     Box(modifier = Modifier.fillMaxSize()) {
         // Dark overlay
         Box(
@@ -74,25 +70,7 @@ fun LoginScreen(
             Button(
                 onClick = {
                     authViewModel.login(email, password, onLoginSuccess) {
-                        onLoginSuccess()
-                        val hasMembership = MembershipManager.getMembershipStatus(currentContext)
-                        Toast.makeText(currentContext, "Membership Status: $hasMembership", Toast.LENGTH_SHORT).show()
-                        Log.d("LoginScreen", "Membership Status: $hasMembership")
-                        if (hasMembership) {
-                            // Navigate to HomeScreen if user has membership
-                            navController.navigate("home") {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    inclusive = true
-                                }
-                            }
-                        } else {
-                            // Navigate to MembershipPurchaseScreen if user does not have membership
-                            navController.navigate("membershipPurchase") {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    inclusive = true
-                                }
-                            }
-                        }
+
                     }
                 },
                 modifier = Modifier

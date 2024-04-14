@@ -1,6 +1,7 @@
 package com.sthapit.taskhub.screens
 
 
+import AuthViewModel
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,16 +36,17 @@ import com.sthapit.taskhub.utils.ValidatorsUtil
 
 @Composable
 fun MembershipPurchaseScreen(
+    authViewModel: AuthViewModel = viewModel(),
     paymentViewModel: PaymentViewModel = viewModel(),
     onPurchaseSuccess: () -> Unit
 ) {
     var paymentStatus by remember { mutableStateOf("Ready to make payment") }
     var showDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
-    val cardNumber = remember { mutableStateOf("") }
-    val expiryYear = remember { mutableStateOf("") }
-    val expiryMonth = remember { mutableStateOf("") }
-    val cvv = remember { mutableStateOf("") }
+    val cardNumber = remember { mutableStateOf("4214029062733657") }
+    val expiryYear = remember { mutableStateOf("2029") }
+    val expiryMonth = remember { mutableStateOf("01") }
+    val cvv = remember { mutableStateOf("947") }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
@@ -107,12 +109,25 @@ fun MembershipPurchaseScreen(
             )
         )
         Button(onClick = {
-            if (!ValidatorsUtil.isValidCardNumber(cardNumber.value) || !ValidatorsUtil.isValidExpiry(expiryMonth.value, expiryYear.value) || !ValidatorsUtil.isValidCVV(cvv.value)) {
-                dialogMessage = "Please check your input fields for errors."
+            if (!ValidatorsUtil.isValidCardNumber(cardNumber.value) ||
+                !ValidatorsUtil.isValidExpiry(expiryMonth.value, expiryYear.value) ||
+                !ValidatorsUtil.isValidCVV(cvv.value)
+            ) {
+                // Show error message if any of the fields are invalid
+                dialogMessage = "Please check your input fields for errors. ${cardNumber.value}, ${expiryMonth.value}, ${expiryYear.value}, ${cvv.value} "
                 showDialog = true
             } else {
-                MembershipManager.saveMembershipStatus(context, true)
-                onPurchaseSuccess()
+                // Process payment if all fields are valid
+                paymentStatus = "Processing..."
+                val cardInfo = CardInfo(cardNumber.value, expiryMonth.value, expiryYear.value, cvv.value)
+                paymentViewModel.processCardPayment(cardInfo) { status, success ->
+                    dialogMessage = status
+                    showDialog = false
+                    if (success) {
+                        authViewModel.changeMembershipStatus()
+                        onPurchaseSuccess()
+                    }
+                }
             }
 
         }) {

@@ -12,6 +12,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,25 +45,20 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation(authViewModel: AuthViewModel, paymentViewModel: PaymentViewModel) {
     val navController = rememberNavController()
 
-    val currentContext = LocalContext.current
-
+    val status by authViewModel.status.collectAsState()
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             LoginScreen(
                 navController = navController,
                 authViewModel = authViewModel,
                 onLoginSuccess = {
-                    val hasMembership = MembershipManager.getMembershipStatus(currentContext)
-                    Toast.makeText(currentContext, "Membership Status: $hasMembership", Toast.LENGTH_SHORT).show()
-                    if (hasMembership) {
-                        // Navigate to HomeScreen if user has membership
+                    if (it == "1") {
                         navController.navigate("mainScreen") {
                             popUpTo(navController.graph.startDestinationId) {
                                 inclusive = true
                             }
                         }
                     } else {
-                        // Navigate to MembershipPurchaseScreen if user does not have membership
                         navController.navigate("membershipPurchase") {
                             popUpTo(navController.graph.startDestinationId) {
                                 inclusive = true
@@ -89,6 +86,7 @@ fun AppNavigation(authViewModel: AuthViewModel, paymentViewModel: PaymentViewMod
         }
         composable("membershipPurchase") {
             MembershipPurchaseScreen(
+                authViewModel = authViewModel,
                 paymentViewModel = paymentViewModel, // Pass the paymentViewModel parameter here
                 onPurchaseSuccess = {
                     navController.navigate("mainScreen")
