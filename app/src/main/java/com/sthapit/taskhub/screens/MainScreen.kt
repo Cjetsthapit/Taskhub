@@ -168,21 +168,44 @@ fun TaskList(tasks: List<Task>, modifier: Modifier = Modifier, onEdit: (Task) ->
 }
 
 @Composable
-fun TaskItem(task: Task, onEdit: () -> Unit, onDelete: () -> Unit) {
+fun TaskItem(task: Task, onEdit: () -> Unit, onDelete: (Task) -> Unit) {
     val context = LocalContext.current
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Task") },
+            text = { Text("Are you sure you want to delete this task?") },
+            confirmButton = {
+                Button(onClick = {
+                    onDelete(task)
+                    showDeleteDialog = false
+                }) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         Column(modifier = Modifier.weight(1f).clickable { onEdit() }) {
             Text(text = task.name, style = MaterialTheme.typography.titleMedium)
             Text(text = "Status: ${if (task.status) "Done" else "To Do"}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Estimation: ${task.timeEstimation} hours", style = MaterialTheme.typography.bodySmall)
         }
-        IconButton(onClick = {shareTask(context, task)}) {
+        IconButton(onClick = { shareTask(context, task) }) {
             Icon(Icons.Filled.Share, contentDescription = "Share")
         }
         IconButton(onClick = onEdit) {
             Icon(Icons.Filled.Edit, contentDescription = "Edit")
         }
-        IconButton(onClick = onDelete) {
+        IconButton(onClick = { showDeleteDialog = true }) {
             Icon(Icons.Filled.Delete, contentDescription = "Delete")
         }
     }
