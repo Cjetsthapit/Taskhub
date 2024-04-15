@@ -79,7 +79,6 @@ class AuthViewModel : ViewModel() {
         val db = FirebaseFirestore.getInstance()
 
         user?.let {
-            // Update only the 'membershipStatus' field to true
             val userData = mapOf("membershipStatus" to "1")  // Use mapOf for immutable map
 
             db.collection("users").document(it.uid).update(userData)

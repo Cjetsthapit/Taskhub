@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import com.sthapit.taskhub.viewmodel.PaymentViewModel
 
 @Composable
@@ -62,6 +63,7 @@ fun LoginScreen(
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                visualTransformation = PasswordVisualTransformation(),
                 singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -70,7 +72,7 @@ fun LoginScreen(
             Button(
                 onClick = {
                     authViewModel.login(email, password, onLoginSuccess) {
-
+                        errorMessage = it
                     }
                 },
                 modifier = Modifier
