@@ -67,12 +67,19 @@ fun MainScreen(taskViewModel: TaskViewModel = viewModel(), navController: NavCon
             }
         }
     ) { padding ->
-        TaskList(tasks = tasks, modifier = Modifier.padding(padding), onEdit = { task ->
-            editingTask = task.copy() // Make a copy for editing
-            showDialog = true
-        }, onDelete = { task ->
-            userId?.let { taskViewModel.deleteTask(task, it) }
-        })
+        if (tasks.isEmpty()) {
+            // Display "No tasks" when there are no tasks
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No tasks", style = MaterialTheme.typography.titleMedium)
+            }
+        } else {
+            TaskList(tasks = tasks, modifier = Modifier.padding(padding), onEdit = { task ->
+                editingTask = task.copy() // Make a copy for editing
+                showDialog = true
+            }, onDelete = { task ->
+                userId?.let { taskViewModel.deleteTask(task, it) }
+            })
+        }
     }
 
     if (showDialog) {
